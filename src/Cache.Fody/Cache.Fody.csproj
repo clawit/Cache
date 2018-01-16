@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageVersion>1.0.1</PackageVersion>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <Description>Cache.Fody</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FodyHelpers" Version="2.3.20" />
+  </ItemGroup>
+</Project>
