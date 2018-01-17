@@ -178,5 +178,89 @@
 
             return methodDefinition;
         }
+
+        //TODO:Add generic parameters support
+        //public static MethodReference MakeHostInstanceGeneric(this MethodReference self, TypeReference[] args)
+        //{
+        //    MethodReference reference = new MethodReference(self.Name, self.ReturnType)
+        //    {
+        //        HasThis = self.HasThis,
+        //        ExplicitThis = self.ExplicitThis,
+        //        CallingConvention = self.CallingConvention,
+        //    };
+
+        //    foreach (ParameterDefinition parameter in self.Parameters)
+        //    {
+        //        reference.Parameters.Add(new ParameterDefinition(parameter.ParameterType));
+        //    }
+
+        //    foreach (GenericParameter genericParam in self.GenericParameters)
+        //    {
+        //        reference.GenericParameters.Add(new GenericParameter(genericParam.Name, reference));
+        //    }
+
+        //    return reference;
+        //}
+
+        public static int AddVariable(this MethodDefinition method, TypeReference typeReference)
+        {
+            method.Body.Variables.Add(method.Module.ImportVariable(typeReference));
+
+            return method.Body.Variables.Count - 1;
+        }
+
+        public static VariableDefinition ImportVariable(this ModuleDefinition module, TypeReference typeReference)
+        {
+            return new VariableDefinition(module.ImportReference(typeReference));
+        }
+
+        public static Instruction AppendLdstr(this Instruction instruction, ILProcessor processor, string str)
+        {
+            return instruction.Append(processor.Create(OpCodes.Ldstr, str), processor);
+        }
+
+        public static Instruction Append(this Instruction instruction, Instruction instructionAfter, ILProcessor processor)
+        {
+            processor.InsertAfter(instruction, instructionAfter);
+
+            return instructionAfter;
+        }
+
+        public static Instruction AppendLdcI4(this Instruction instruction, ILProcessor processor, int value)
+        {
+            return instruction.Append(processor.Create(OpCodes.Ldc_I4, value), processor);
+        }
+
+        public static Instruction AppendDup(this Instruction instruction, ILProcessor processor)
+        {
+            return instruction.Append(processor.Create(OpCodes.Dup), processor);
+        }
+
+        public static Instruction AppendLdloc(this Instruction instruction, ILProcessor processor, int index)
+        {
+            return instruction.Append(processor.Create(OpCodes.Ldloc, index), processor);
+        }
+
+        public static MethodReference ImportMethod(this ModuleDefinition module, MethodDefinition methodDefinition)
+        {
+            return module.ImportMethod(methodDefinition);
+        }
+
+        public static Instruction Prepend(this Instruction instruction, Instruction instructionBefore, ILProcessor processor)
+        {
+            processor.InsertBefore(instruction, instructionBefore);
+
+            return instructionBefore;
+        }
+
+        public static Instruction AppendStloc(this Instruction instruction, ILProcessor processor, int index)
+        {
+            return instruction.Append(processor.Create(OpCodes.Stloc, index), processor);
+        }
+
+        public static Instruction AppendLdarg(this Instruction instruction, ILProcessor processor, int index)
+        {
+            return instruction.Append(processor.Create(OpCodes.Ldarg, index), processor);
+        }
     }
 }

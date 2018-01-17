@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using Fody;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -293,21 +295,22 @@ namespace Cache.Fody
             return cacheType.Method(cacheTypeRetrieveMethodName);
         }
 
-        internal static void WeavePropertySetter(MethodDefinition setter, MethodReference propertyGet)
+        internal static void WeavePropertySetter(BaseModuleWeaver weaver, MethodDefinition setter, MethodReference propertyGet)
         {
             setter.Body.InitLocals = true;
             setter.Body.SimplifyMacros();
 
-            if (propertyGet.DeclaringType.HasGenericParameters)
-            {
-                propertyGet = propertyGet.MakeHostInstanceGeneric(propertyGet.DeclaringType.GenericParameters.Cast<TypeReference>().ToArray());
-            }
+            //TODO:Add generic parameters support
+            //if (propertyGet.DeclaringType.HasGenericParameters)
+            //{
+            //    propertyGet = propertyGet.MakeHostInstanceGeneric(propertyGet.DeclaringType.GenericParameters.Cast<TypeReference>().ToArray());
+            //}
 
             Instruction firstInstruction = setter.Body.Instructions.First();
             ILProcessor processor = setter.Body.GetILProcessor();
 
             // Add local variables
-            int cacheKeyIndex = setter.AddVariable(ModuleDefinition.TypeSystem.String);
+            int cacheKeyIndex = setter.AddVariable(weaver.ModuleDefinition.TypeSystem.String);
 
             // Generate CacheKeyTemplate
             string cacheKey = CreateCacheKeyString(setter);
@@ -317,7 +320,7 @@ namespace Cache.Fody
             // Create set cache key
             current = current.AppendStloc(processor, cacheKeyIndex);
 
-            current = InjectCacheKeyCreatedCode(setter, current, processor, cacheKeyIndex);
+            current = InjectCacheKeyCreatedCode(weaver, setter, current, processor, cacheKeyIndex);
 
 
             if (!propertyGet.Resolve().IsStatic)
@@ -326,12 +329,56 @@ namespace Cache.Fody
             }
 
             current
-                .Append(processor.Create(OpCodes.Call, setter.Module.Import(propertyGet)), processor)
+                .Append(processor.Create(OpCodes.Call, setter.Module.ImportReference(propertyGet)), processor)
                 .AppendLdloc(processor, cacheKeyIndex)
-                .Append(processor.Create(OpCodes.Callvirt, setter.Module.Import(
+                .Append(processor.Create(OpCodes.Callvirt, setter.Module.ImportReference(
                     CacheTypeGetRemoveMethod(propertyGet.ReturnType.Resolve(), CacheTypeRemoveMethodName))), processor);
 
             setter.Body.OptimizeMacros();
+        }
+
+        private static string CreateCacheKeyString(MethodDefinition methodDefinition)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            builder.Append(methodDefinition.DeclaringType.FullName);
+            builder.Append(".");
+
+            if (methodDefinition.IsSpecialName && (methodDefinition.IsSetter || methodDefinition.IsGetter))
+            {
+                builder.Append(Regex.Replace(methodDefinition.Name, "[gs]et_", string.Empty));
+            }
+            else
+            {
+                builder.Append(methodDefinition.Name);
+
+                for (int i = 0; i < methodDefinition.Parameters.Count + methodDefinition.GenericParameters.Count; i++)
+                {
+                    builder.Append(string.Format("_{{{0}}}", i));
+                }
+            }
+
+            return builder.ToString();
+        }
+
+        private static Instruction InjectCacheKeyCreatedCode(BaseModuleWeaver weaver, MethodDefinition methodDefinition, Instruction current, ILProcessor processor, int cacheKeyIndex)
+        {
+            // Call Debug.WriteLine with CacheKey
+            current = current
+                .AppendLdstr(processor, "CacheKey created: {0}")
+                .AppendLdcI4(processor, 1)
+                .Append(processor.Create(OpCodes.Newarr, weaver.ModuleDefinition.TypeSystem.Object), processor)
+                .AppendDup(processor)
+                .AppendLdcI4(processor, 0)
+                .AppendLdloc(processor, cacheKeyIndex)
+                .Append(processor.Create(OpCodes.Stelem_Ref), processor)
+                .Append(processor.Create(OpCodes.Call, methodDefinition.Module.ImportMethod(References.StringFormatMethod)),
+                    processor)
+                .Append(processor.Create(OpCodes.Call, methodDefinition.Module.ImportMethod(References.DebugWriteLineMethod)),
+                    processor);
+            
+
+            return current;
         }
     }
 }
