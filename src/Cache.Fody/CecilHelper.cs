@@ -63,7 +63,7 @@ namespace Cache.Fody
                     break;
 
                 case MetadataType.Object:
-                    return instruction.AppendLd(processor, (CustomAttributeArgument)argument.Value, references);
+                    return instruction.AppendLd(processor, (CustomAttributeArgument)argument.Value, );
 
                 case MetadataType.Array:
                     CustomAttributeArgument[] values = (CustomAttributeArgument[])argument.Value;
