@@ -1,4 +1,4 @@
-﻿namespace Cache.Attribute
+﻿namespace Cache
 {
     using System;
 

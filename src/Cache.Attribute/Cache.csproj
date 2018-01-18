@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net46;netstandard2.0</TargetFrameworks>
+    <PackageVersion>1.0.1</PackageVersion>
+    <Description>Cache</Description>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Fody" Version="2.3.20" />
+    <PackageReference Include="FodyPackaging" Version="2.3.20" />
+  </ItemGroup>
+
+</Project>
