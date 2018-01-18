@@ -2,7 +2,9 @@
 {
     using global::Fody;
     using Mono.Cecil;
+    using Mono.Cecil.Rocks;
     using System.Collections.Generic;
+    using System.Linq;
 
     public static class ReferenceFinder
     {
@@ -27,10 +29,10 @@
         {
             _weaver = weaver;
 
-            DebugWriteLineMethod = weaver.FindType("System.String").Method("WriteLine");
+            DebugWriteLineMethod = weaver.FindType("System.Diagnostics.Debug").Method("WriteLine");
             StringFormatMethod = weaver.FindType("System.String").Method("Format");
-            DictionaryConstructor = weaver.FindType("IDictionary`2").Method(".ctor");
-            DictionaryAddMethod = weaver.FindType("IDictionary`2").Method("Add");
+            DictionaryConstructor = weaver.FindType("Dictionary`2").Resolve().GetConstructors().FirstOrDefault();
+            DictionaryAddMethod = weaver.FindType("Dictionary`2").Method("Add");
             SystemTypeGetTypeFromHandleMethod = weaver.FindType("Type").Method("GetTypeFromHandle");
         }
 

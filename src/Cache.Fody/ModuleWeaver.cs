@@ -35,8 +35,16 @@ namespace Cache.Fody
 
         public override IEnumerable<string> GetAssembliesForScanning()
         {
-            yield return "netstandard";
+            yield return "System.Runtime.Extensions";
+            yield return "System";
             yield return "mscorlib";
+            yield return "System.Diagnostics.TraceSource";
+            yield return "System.Diagnostics.Debug";
+            yield return "System.Reflection";
+            yield return "System.Runtime";
+            yield return "System.Reflection";
+            yield return "System.Core";
+            yield return "netstandard";
         }
 
         public override bool ShouldCleanReference => true;
