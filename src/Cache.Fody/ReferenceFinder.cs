@@ -1,48 +1,47 @@
 ﻿namespace Cache.Fody
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using global::Fody;
     using Mono.Cecil;
-    using Mono.Cecil.Rocks;
+    using System.Collections.Generic;
 
-    internal class ReferenceFinder
+    public static class ReferenceFinder
     {
-        internal BaseModuleWeaver Weaver { get; set; }
-        internal IAssemblyResolver AssemblyResolver { get; set; }
+        //private static IAssemblyResolver AssemblyResolver { get; set; }
 
-        //internal TypeDefinition CompilerGeneratedAttribute { get; set; }
+        //private static TypeDefinition CompilerGeneratedAttribute { get; set; }
 
-        internal MethodDefinition DebugWriteLineMethod { get; set; }
+        private static BaseModuleWeaver _weaver;
+        public static BaseModuleWeaver Weaver { get { return _weaver; } }
 
-        internal MethodReference DictionaryAddMethod { get; set; }
+        public static MethodDefinition DebugWriteLineMethod { get; set; }
 
-        internal MethodReference DictionaryConstructor { get; set; }
+        public static MethodReference DictionaryAddMethod { get; set; }
 
-        internal ModuleDefinition ModuleDefinition { get; set; }
+        public static MethodReference DictionaryConstructor { get; set; }
 
-        internal MethodDefinition StringFormatMethod { get; set; }
+        public static MethodDefinition StringFormatMethod { get; set; }
 
-        internal MethodDefinition SystemTypeGetTypeFromHandleMethod { get; set; }
+        public static MethodDefinition SystemTypeGetTypeFromHandleMethod { get; set; }
 
-        internal void LoadReferences()
+        public static void LoadReferences(BaseModuleWeaver weaver)
         {
-            DebugWriteLineMethod = Weaver.FindType("System.String").Method("WriteLine");
-            StringFormatMethod = Weaver.FindType("System.String").Method("Format");
-            DictionaryConstructor = Weaver.FindType("IDictionary`2").Method(".ctor");
-            DictionaryAddMethod = Weaver.FindType("IDictionary`2").Method("Add");
-            SystemTypeGetTypeFromHandleMethod = Weaver.FindType("Type").Method("GetTypeFromHandle");
+            _weaver = weaver;
+
+            DebugWriteLineMethod = weaver.FindType("System.String").Method("WriteLine");
+            StringFormatMethod = weaver.FindType("System.String").Method("Format");
+            DictionaryConstructor = weaver.FindType("IDictionary`2").Method(".ctor");
+            DictionaryAddMethod = weaver.FindType("IDictionary`2").Method("Add");
+            SystemTypeGetTypeFromHandleMethod = weaver.FindType("Type").Method("GetTypeFromHandle");
         }
 
-        internal void AppendTypes(string name, List<TypeDefinition> coreTypes)
-        {
-            AssemblyDefinition definition = AssemblyResolver.Resolve(AssemblyNameReference.Parse(name));
-            if (definition != null)
-            {
-                coreTypes.AddRange(definition.MainModule.Types);
-            }
-        }
+        //private static void AppendTypes(string name, List<TypeDefinition> coreTypes)
+        //{
+        //    AssemblyDefinition definition = AssemblyResolver.Resolve(AssemblyNameReference.Parse(name));
+        //    if (definition != null)
+        //    {
+        //        coreTypes.AddRange(definition.MainModule.Types);
+        //    }
+        //}
 
     }
 }

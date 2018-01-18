@@ -9,7 +9,6 @@ namespace Cache.Fody
 {
     public class ModuleWeaver : BaseModuleWeaver
     {
-        internal ReferenceFinder _references;
         internal List<TypeDefinition> _types;
 
         public override void Execute()
@@ -21,11 +20,10 @@ namespace Cache.Fody
             AttributeChecker.CheckForBadAttributes(this, _types);
 
             //
-            _references = new ReferenceFinder() { Weaver = this, AssemblyResolver = ModuleDefinition.AssemblyResolver, ModuleDefinition = ModuleDefinition };
-            _references.LoadReferences();
+            ReferenceFinder.LoadReferences(this);
 
             //
-            var methods = this.GetWeaveMethods();
+            var methods = WeaveHelper.GetWeaveMethods(this);
 
             //weaving
             WeaveHelper.Weave(this, methods.Methods);

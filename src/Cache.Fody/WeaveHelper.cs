@@ -10,19 +10,19 @@ using Mono.Cecil.Rocks;
 
 namespace Cache.Fody
 {
-    internal static class WeaveHelper
+    public static class WeaveHelper
     {
-        internal const string CacheAttributeName = "CacheAttribute";
-        internal const string NoCacheAttributeName = "NoCacheAttribute";
-        internal const string CompilerGeneratedAttributeName = "CompilerGeneratedAttribute";
+        public const string CacheAttributeName = "CacheAttribute";
+        public const string NoCacheAttributeName = "NoCacheAttribute";
+        public const string CompilerGeneratedAttributeName = "CompilerGeneratedAttribute";
 
-        internal const string CacheGetterName = "Cache";
-        internal const string CacheTypeContainsMethodName = "Contains";
-        internal const string CacheTypeRemoveMethodName = "Remove";
-        internal const string CacheTypeRetrieveMethodName = "Retrieve";
-        internal const string CacheTypeStoreMethodName = "Store";
+        private const string CacheGetterName = "Cache";
+        private const string CacheTypeContainsMethodName = "Contains";
+        private const string CacheTypeRemoveMethodName = "Remove";
+        private const string CacheTypeRetrieveMethodName = "Retrieve";
+        private const string CacheTypeStoreMethodName = "Store";
 
-        internal static MethodsForWeaving GetWeaveMethods(this BaseModuleWeaver weaver)
+        public static MethodsForWeaving GetWeaveMethods(BaseModuleWeaver weaver)
         {
             
             weaver.LogInfo(string.Format("Searching for Methods and Properties in assembly ({0}).", weaver.ModuleDefinition.Name));
@@ -72,7 +72,7 @@ namespace Cache.Fody
             return result;
         }
 
-        internal static bool ShouldWeaveMethod(MethodDefinition method)
+        private static bool ShouldWeaveMethod(MethodDefinition method)
         {
             CustomAttribute classLevelCacheAttribute = method.DeclaringType.GetCacheAttribute(CacheAttributeName);
 
@@ -103,7 +103,7 @@ namespace Cache.Fody
             return false;
         }
 
-        internal static bool ShouldWeaveProperty(PropertyDefinition property)
+        private static bool ShouldWeaveProperty(PropertyDefinition property)
         {
             CustomAttribute classLevelCacheAttribute = property.DeclaringType.GetCacheAttribute(CacheAttributeName);
 
@@ -135,15 +135,15 @@ namespace Cache.Fody
             return false;
         }
 
-        internal static void Weave(BaseModuleWeaver weaver, IEnumerable<Tuple<MethodDefinition, CustomAttribute>> methods )
+        public static void Weave(BaseModuleWeaver weaver, IEnumerable<Tuple<MethodDefinition, CustomAttribute>> methods )
         {
             foreach (Tuple<MethodDefinition, CustomAttribute> methodDefinition in methods)
             {
-                WeaveMethod(methodDefinition.Item1, methodDefinition.Item2);
+                WeaveMethod(weaver, methodDefinition.Item1, methodDefinition.Item2);
             }
         }
 
-        internal static void Weave(BaseModuleWeaver weaver, IEnumerable<Tuple<PropertyDefinition, CustomAttribute>> properties)
+        public static void Weave(BaseModuleWeaver weaver, IEnumerable<Tuple<PropertyDefinition, CustomAttribute>> properties)
         {
             foreach (Tuple<PropertyDefinition, CustomAttribute> propertyTuple in properties)
             {
@@ -153,7 +153,7 @@ namespace Cache.Fody
                 // Get-Only Property, weave like normal methods
                 if (property.SetMethod == null)
                 {
-                    WeaveMethod(property.GetMethod, attribute);
+                    WeaveMethod(weaver, property.GetMethod, attribute);
                 }
                 else
                 {
@@ -166,13 +166,13 @@ namespace Cache.Fody
 
                     weaver.LogInfo(string.Format("Weaving property {0}::{1}.", property.DeclaringType.Name, property.Name));
 
-                    WeaveMethod(property.GetMethod, attribute, propertyGet);
-                    WeavePropertySetter(property.SetMethod, propertyGet);
+                    WeaveMethod(weaver, property.GetMethod, attribute, propertyGet);
+                    WeavePropertySetter(weaver, property.SetMethod, propertyGet);
                 }
             }
         }
 
-        internal static MethodDefinition GetCacheGetter(MethodDefinition methodDefinition)
+        private static MethodDefinition GetCacheGetter(MethodDefinition methodDefinition)
         {
             MethodDefinition propertyGet = methodDefinition.DeclaringType.GetPropertyGet(CacheGetterName);
 
@@ -182,7 +182,7 @@ namespace Cache.Fody
             return propertyGet;
         }
 
-        internal static bool IsPropertySetterValidForWeaving(BaseModuleWeaver weaver, MethodDefinition propertyGet, MethodDefinition methodDefinition)
+        private static bool IsPropertySetterValidForWeaving(BaseModuleWeaver weaver, MethodDefinition propertyGet, MethodDefinition methodDefinition)
         {
             if (!IsMethodValidForWeaving(weaver, propertyGet, methodDefinition))
             {
@@ -205,7 +205,7 @@ namespace Cache.Fody
             return true;
         }
 
-        internal static bool IsMethodValidForWeaving(BaseModuleWeaver weaver, MethodDefinition propertyGet, MethodDefinition methodDefinition)
+        public static bool IsMethodValidForWeaving(BaseModuleWeaver weaver, MethodDefinition propertyGet, MethodDefinition methodDefinition)
         {
             if (propertyGet == null)
             {
@@ -236,12 +236,12 @@ namespace Cache.Fody
             return true;
         }
 
-        internal static MethodDefinition CacheTypeGetRemoveMethod(TypeDefinition cacheType, string cacheTypeRemoveMethodName)
+        private static MethodDefinition CacheTypeGetRemoveMethod(TypeDefinition cacheType, string cacheTypeRemoveMethodName)
         {
             return cacheType.Method(cacheTypeRemoveMethodName);
         }
 
-        internal static bool CheckCacheTypeMethods(BaseModuleWeaver weaver, TypeDefinition cacheType)
+        private static bool CheckCacheTypeMethods(BaseModuleWeaver weaver, TypeDefinition cacheType)
         {
             weaver.LogInfo(string.Format("Checking CacheType methods ({0}, {1}, {2}).", CacheTypeContainsMethodName,
                 CacheTypeStoreMethodName, CacheTypeRetrieveMethodName));
@@ -272,12 +272,12 @@ namespace Cache.Fody
             return true;
         }
 
-        internal static MethodDefinition CacheTypeGetContainsMethod(TypeDefinition cacheType, string cacheTypeContainsMethodName)
+        private static MethodDefinition CacheTypeGetContainsMethod(TypeDefinition cacheType, string cacheTypeContainsMethodName)
         {
             return cacheType.Method(cacheTypeContainsMethodName);
         }
 
-        internal static MethodDefinition CacheTypeGetStoreMethod(TypeDefinition cacheInterface, string cacheTypeStoreMethodName)
+        private static MethodDefinition CacheTypeGetStoreMethod(TypeDefinition cacheInterface, string cacheTypeStoreMethodName)
         {
             // Prioritize Store methods with parameters Dictionary
             MethodDefinition methodDefinition = cacheInterface.Method(cacheTypeStoreMethodName);
@@ -290,12 +290,12 @@ namespace Cache.Fody
             return cacheInterface.Method(cacheTypeStoreMethodName);
         }
 
-        internal static MethodDefinition CacheTypeGetRetrieveMethod(TypeDefinition cacheType, string cacheTypeRetrieveMethodName)
+        private static MethodDefinition CacheTypeGetRetrieveMethod(TypeDefinition cacheType, string cacheTypeRetrieveMethodName)
         {
             return cacheType.Method(cacheTypeRetrieveMethodName);
         }
 
-        internal static void WeavePropertySetter(BaseModuleWeaver weaver, MethodDefinition setter, MethodReference propertyGet)
+        private static void WeavePropertySetter(BaseModuleWeaver weaver, MethodDefinition setter, MethodReference propertyGet)
         {
             setter.Body.InitLocals = true;
             setter.Body.SimplifyMacros();
@@ -372,13 +372,219 @@ namespace Cache.Fody
                 .AppendLdcI4(processor, 0)
                 .AppendLdloc(processor, cacheKeyIndex)
                 .Append(processor.Create(OpCodes.Stelem_Ref), processor)
-                .Append(processor.Create(OpCodes.Call, methodDefinition.Module.ImportMethod(References.StringFormatMethod)),
+                .Append(processor.Create(OpCodes.Call, methodDefinition.Module.ImportMethod(ReferenceFinder.StringFormatMethod)),
                     processor)
-                .Append(processor.Create(OpCodes.Call, methodDefinition.Module.ImportMethod(References.DebugWriteLineMethod)),
+                .Append(processor.Create(OpCodes.Call, methodDefinition.Module.ImportMethod(ReferenceFinder.DebugWriteLineMethod)),
                     processor);
             
 
             return current;
         }
+
+        public static void WeaveMethod(BaseModuleWeaver weaver, MethodDefinition methodDefinition, CustomAttribute attribute, MethodReference propertyGet)
+        {
+            methodDefinition.Body.InitLocals = true;
+
+            methodDefinition.Body.SimplifyMacros();
+
+            //TODO:Add generic parameters support
+            //if (propertyGet.DeclaringType.HasGenericParameters)
+            //{
+            //    propertyGet = propertyGet.MakeHostInstanceGeneric(propertyGet.DeclaringType.GenericParameters.Cast<TypeReference>().ToArray());
+            //}
+
+            Instruction firstInstruction = methodDefinition.Body.Instructions.First();
+
+            ICollection<Instruction> returnInstructions =
+                methodDefinition.Body.Instructions.ToList().Where(x => x.OpCode == OpCodes.Ret).ToList();
+
+            if (returnInstructions.Count == 0)
+            {
+                weaver.LogWarning(string.Format("Method {0} does not contain any return statement. Skip weaving of method {0}.",
+                    methodDefinition.Name));
+                return;
+            }
+
+            // Add local variables
+            int cacheKeyIndex = methodDefinition.AddVariable(weaver.ModuleDefinition.TypeSystem.String);
+            int resultIndex = methodDefinition.AddVariable(methodDefinition.ReturnType);
+            int objectArrayIndex = methodDefinition.AddVariable(weaver.ModuleDefinition.TypeSystem.Object.MakeArrayType());
+
+            ILProcessor processor = methodDefinition.Body.GetILProcessor();
+
+            // Generate CacheKeyTemplate
+            string cacheKey = CreateCacheKeyString(methodDefinition);
+
+            Instruction current = firstInstruction.Prepend(processor.Create(OpCodes.Ldstr, cacheKey), processor);
+
+            current = SetCacheKeyLocalVariable(weaver, current, methodDefinition, processor, cacheKeyIndex, objectArrayIndex);
+
+            current = InjectCacheKeyCreatedCode(weaver, methodDefinition, current, processor, cacheKeyIndex);
+
+            TypeDefinition propertyGetReturnTypeDefinition = propertyGet.ReturnType.Resolve();
+
+            if (!propertyGet.Resolve().IsStatic)
+            {
+                current = current.AppendLdarg(processor, 0);
+            }
+
+            MethodReference methodReferenceContain =
+                methodDefinition.Module.ImportMethod(CacheTypeGetContainsMethod(propertyGetReturnTypeDefinition,
+                    CacheTypeContainsMethodName));
+
+            current = current
+                .Append(processor.Create(OpCodes.Call, methodDefinition.Module.ImportReference(propertyGet)), processor)
+                .AppendLdloc(processor, cacheKeyIndex)
+                .Append(processor.Create(OpCodes.Callvirt, methodReferenceContain), processor)
+                .Append(processor.Create(OpCodes.Brfalse, firstInstruction), processor);
+
+            // False branche (store value in cache of each return instruction)
+            foreach (Instruction returnInstruction in returnInstructions)
+            {
+                returnInstruction.Previous.AppendStloc(processor, resultIndex);
+
+
+                AppendDebugWrite(weaver, returnInstruction.Previous, processor, "Storing to cache.");
+           
+
+                if (!propertyGet.Resolve().IsStatic)
+                {
+                    returnInstruction.Previous.AppendLdarg(processor, 0);
+                }
+
+                MethodReference methodReferenceStore =
+                    methodDefinition.Module.ImportMethod(CacheTypeGetStoreMethod(propertyGetReturnTypeDefinition, CacheTypeStoreMethodName));
+
+                returnInstruction.Previous
+                    .Append(processor.Create(OpCodes.Call, methodDefinition.Module.ImportReference(propertyGet)), processor)
+                    .AppendLdloc(processor, cacheKeyIndex)
+                    .AppendLdloc(processor, resultIndex)
+                    .AppendBoxIfNecessary(processor, methodDefinition.ReturnType);
+
+                // Pass parameters to Store method if supported
+                if (methodReferenceStore.Parameters.Count == 3)
+                {
+                    returnInstruction.Previous
+                        .Append(processor.Create(OpCodes.Newobj,
+                            methodDefinition.Module.ImportReference(ReferenceFinder.DictionaryConstructor)), processor);
+
+                    foreach (CustomAttributeNamedArgument property in attribute.Properties.Union(attribute.Fields))
+                    {
+                        returnInstruction.Previous
+                            .AppendDup(processor)
+                            .AppendLdstr(processor, property.Name)
+                            .AppendLd(processor, property.Argument)
+                            .AppendBoxIfNecessary(processor,
+                                property.Argument.Type != weaver.ModuleDefinition.TypeSystem.Object
+                                    ? property.Argument.Type : ((CustomAttributeArgument)property.Argument.Value).Type)
+                            .Append(processor.Create(OpCodes.Callvirt, methodDefinition.Module.ImportReference(ReferenceFinder.DictionaryAddMethod)),
+                                processor);
+                    }
+                }
+
+                returnInstruction.Previous
+                    .Append(processor.Create(OpCodes.Callvirt, methodReferenceStore), processor)
+                    .AppendLdloc(processor, resultIndex);
+            }
+
+
+            current = AppendDebugWrite(weaver, current, processor, "Loading from cache.");
+
+
+            if (!propertyGet.Resolve().IsStatic)
+            {
+                current = current.AppendLdarg(processor, 0);
+            }
+
+            // Start of branche true
+            MethodReference methodReferenceRetrieve =
+                methodDefinition.Module.ImportMethod(CacheTypeGetRetrieveMethod(propertyGetReturnTypeDefinition,
+                    CacheTypeRetrieveMethodName)).MakeGeneric(new[] { methodDefinition.ReturnType });
+
+            current.Append(processor.Create(OpCodes.Call, methodDefinition.Module.ImportReference(propertyGet)), processor)
+                .AppendLdloc(processor, cacheKeyIndex)
+                .Append(processor.Create(OpCodes.Callvirt, methodReferenceRetrieve), processor)
+                .AppendStloc(processor, resultIndex)
+                .Append(processor.Create(OpCodes.Br, returnInstructions.Last().Previous), processor);
+
+            methodDefinition.Body.OptimizeMacros();
+        }
+
+        public static void WeaveMethod(BaseModuleWeaver weaver, MethodDefinition methodDefinition, CustomAttribute attribute)
+        {
+            MethodDefinition propertyGet = GetCacheGetter(methodDefinition);
+
+            if (!IsMethodValidForWeaving(weaver, propertyGet, methodDefinition))
+            {
+                return;
+            }
+
+            if (methodDefinition.ReturnType == methodDefinition.Module.TypeSystem.Void)
+            {
+                weaver.LogWarning(string.Format("Method {0} returns void. Skip weaving of method {0}.", methodDefinition.Name));
+
+                return;
+            }
+
+            weaver.LogInfo(string.Format("Weaving method {0}::{1}.", methodDefinition.DeclaringType.Name, methodDefinition.Name));
+
+            WeaveMethod(weaver, methodDefinition, attribute, propertyGet);
+        }
+        private static Instruction AppendDebugWrite(BaseModuleWeaver weaver, Instruction instruction, ILProcessor processor, string message)
+        {
+            return instruction
+                .AppendLdstr(processor, message)
+                .Append(processor.Create(OpCodes.Call, weaver.ModuleDefinition.ImportMethod(ReferenceFinder.DebugWriteLineMethod)), processor);
+        }
+
+        private static Instruction SetCacheKeyLocalVariable(BaseModuleWeaver weaver, Instruction current, MethodDefinition methodDefinition,
+            ILProcessor processor, int cacheKeyIndex, int objectArrayIndex)
+        {
+            if (methodDefinition.IsSetter || methodDefinition.IsGetter)
+            {
+                return current.AppendStloc(processor, cacheKeyIndex);
+            }
+            else
+            {
+                // Create object[] for string.format
+                int parameterCount = methodDefinition.Parameters.Count + methodDefinition.GenericParameters.Count;
+
+                current = current
+                    .AppendLdcI4(processor, parameterCount)
+                    .Append(processor.Create(OpCodes.Newarr, weaver.ModuleDefinition.TypeSystem.Object), processor)
+                    .AppendStloc(processor, objectArrayIndex);
+
+
+                // Set object[] values
+                for (int i = 0; i < methodDefinition.GenericParameters.Count; i++)
+                {
+                    current = current
+                        .AppendLdloc(processor, objectArrayIndex)
+                        .AppendLdcI4(processor, i)
+                        .Append(processor.Create(OpCodes.Ldtoken, methodDefinition.GenericParameters[i]), processor)
+                        .Append(processor.Create(OpCodes.Call, methodDefinition.Module.ImportMethod(ReferenceFinder.SystemTypeGetTypeFromHandleMethod)),
+                        processor)
+                        .Append(processor.Create(OpCodes.Stelem_Ref), processor);
+                }
+
+                for (int i = 0; i < methodDefinition.Parameters.Count; i++)
+                {
+                    current = current
+                        .AppendLdloc(processor, objectArrayIndex)
+                        .AppendLdcI4(processor, methodDefinition.GenericParameters.Count + i)
+                        .AppendLdarg(processor, !methodDefinition.IsStatic ? i + 1 : i)
+                        .AppendBoxIfNecessary(processor, methodDefinition.Parameters[i].ParameterType)
+                        .Append(processor.Create(OpCodes.Stelem_Ref), processor);
+                }
+
+                // Call string.format
+                return current
+                    .AppendLdloc(processor, objectArrayIndex)
+                    .Append(processor.Create(OpCodes.Call, methodDefinition.Module.ImportMethod(ReferenceFinder.StringFormatMethod)),
+                        processor)
+                    .AppendStloc(processor, cacheKeyIndex);
+            }
+        }
+
     }
 }

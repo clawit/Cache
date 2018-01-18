@@ -262,5 +262,200 @@
         {
             return instruction.Append(processor.Create(OpCodes.Ldarg, index), processor);
         }
+
+        public static Instruction AppendBoxIfNecessary(this Instruction instruction, ILProcessor processor, TypeReference typeReference)
+        {
+            if (typeReference.IsValueType || typeReference.IsGenericParameter)
+            {
+                return instruction.Append(processor.Create(OpCodes.Box, typeReference), processor);
+            }
+
+            return instruction;
+        }
+
+        public static Instruction AppendLd(this Instruction instruction, ILProcessor processor, CustomAttributeArgument argument)
+        {
+            // Tested with the following types (see ECMA-334, 24.1.3 attribute parameter types)
+            // bool, byte, char, double, float, int, long, sbyte, short, string, uint, ulong, ushort.
+            // object
+            // System.Type
+            // An enum type, provided it has public accessibility and the types in which it is nested (if any) also have public accessibility (§17.2)
+            // Single-dimensional arrays of the above types
+            TypeReference argumentType = argument.Type;
+
+            switch (argumentType.MetadataType)
+            {
+                case MetadataType.ValueType:
+                    if (argumentType.Resolve().IsEnum == false)
+                    {
+                        throw new ArgumentException("Type Enum expected.", "argument");
+                    }
+
+                    // Get underlying Enum type
+                    argumentType = argument.Type.Resolve().Fields.First(field => field.Name == "value__").FieldType;
+                    break;
+
+                case MetadataType.Object:
+                    return instruction.AppendLd(processor, (CustomAttributeArgument)argument.Value);
+
+                case MetadataType.Array:
+                    CustomAttributeArgument[] values = (CustomAttributeArgument[])argument.Value;
+
+                    instruction = instruction
+                        .AppendLdcI4(processor, values.Length)
+                        .Append(processor.Create(OpCodes.Newarr, argument.Type.GetElementType()), processor);
+
+                    TypeReference arrayType = argument.Type.GetElementType();
+
+                    for (int i = 0; i < values.Length; i++)
+                    {
+                        instruction = instruction
+                            .AppendDup(processor)
+                            .AppendLdcI4(processor, i)
+                            .AppendLd(processor, values[i]);
+
+                        if (arrayType == ReferenceFinder.Weaver.ModuleDefinition.TypeSystem.Object)
+                        {
+                            instruction = instruction.AppendBoxIfNecessary(processor, ((CustomAttributeArgument)values[i].Value).Type);
+                        }
+                        else if (argumentType.Resolve().IsEnum)
+                        {
+                            // Get underlying Enum type
+                            arrayType = argument.Type.Resolve().Fields.First(field => field.Name == "value__").FieldType;
+                        }
+
+                        if (arrayType.IsValueType)
+                        {
+                            switch (arrayType.MetadataType)
+                            {
+                                case MetadataType.Boolean:
+                                case MetadataType.SByte:
+                                case MetadataType.Byte:
+                                    instruction = instruction.Append(processor.Create(OpCodes.Stelem_I1), processor);
+                                    break;
+
+                                case MetadataType.Char:
+                                case MetadataType.Int16:
+                                case MetadataType.UInt16:
+                                    instruction = instruction.Append(processor.Create(OpCodes.Stelem_I2), processor);
+                                    break;
+
+                                case MetadataType.Int32:
+                                case MetadataType.UInt32:
+                                    instruction = instruction.Append(processor.Create(OpCodes.Stelem_I4), processor);
+                                    break;
+
+                                case MetadataType.Int64:
+                                case MetadataType.UInt64:
+                                    instruction = instruction.Append(processor.Create(OpCodes.Stelem_I8), processor);
+                                    break;
+
+                                case MetadataType.Single:
+                                    instruction = instruction.Append(processor.Create(OpCodes.Stelem_R4), processor);
+                                    break;
+
+                                case MetadataType.Double:
+                                    instruction = instruction.Append(processor.Create(OpCodes.Stelem_R8), processor);
+                                    break;
+
+                                default:
+                                    throw new ArgumentException("Unrecognized array value type.", "argument");
+                            }
+                        }
+                        else
+                        {
+                            instruction = instruction.Append(processor.Create(OpCodes.Stelem_Ref), processor);
+                        }
+                    }
+
+                    return instruction;
+            }
+
+            switch (argumentType.MetadataType)
+            {
+                case MetadataType.Boolean:
+                case MetadataType.SByte:
+                    return instruction.Append(processor.Create(OpCodes.Ldc_I4_S, Convert.ToSByte(argument.Value)), processor);
+
+                case MetadataType.Int16:
+                    return instruction.Append(processor.Create(OpCodes.Ldc_I4, Convert.ToInt16(argument.Value)), processor);
+
+                case MetadataType.Int32:
+                    return instruction.Append(processor.Create(OpCodes.Ldc_I4, Convert.ToInt32(argument.Value)), processor);
+
+                case MetadataType.Int64:
+                    return instruction.Append(processor.Create(OpCodes.Ldc_I8, Convert.ToInt64(argument.Value)), processor);
+
+                case MetadataType.Byte:
+                    return instruction.Append(processor.Create(OpCodes.Ldc_I4, Convert.ToInt32(argument.Value)), processor);
+
+                case MetadataType.UInt16:
+                    unchecked
+                    {
+                        return instruction.Append(processor.Create(OpCodes.Ldc_I4, (Int16)(UInt16)argument.Value), processor);
+                    }
+
+                case MetadataType.Char:
+                    return instruction.Append(processor.Create(OpCodes.Ldc_I4, Convert.ToChar(argument.Value)), processor);
+
+                case MetadataType.UInt32:
+                    unchecked
+                    {
+                        return instruction.Append(processor.Create(OpCodes.Ldc_I4, (Int32)(UInt32)argument.Value), processor);
+                    }
+
+                case MetadataType.UInt64:
+                    unchecked
+                    {
+                        return instruction.Append(processor.Create(OpCodes.Ldc_I8, (Int64)(UInt64)argument.Value), processor);
+                    }
+
+                case MetadataType.Single:
+                    return instruction.Append(processor.Create(OpCodes.Ldc_R4, Convert.ToSingle(argument.Value)), processor);
+
+                case MetadataType.Double:
+                    return instruction.Append(processor.Create(OpCodes.Ldc_R8, Convert.ToDouble(argument.Value)), processor);
+
+                case MetadataType.String:
+                    return instruction.Append(processor.Create(OpCodes.Ldstr, (string)argument.Value), processor);
+
+                case MetadataType.Class:
+                    if (argumentType.Resolve().IsDefinition == false)
+                    {
+                        throw new ArgumentException("Type Type expected.", "argument");
+                    }
+
+                    return
+                        instruction
+                            .Append(processor.Create(OpCodes.Ldtoken, (TypeReference)argument.Value), processor)
+                            .Append(processor.Create(OpCodes.Call, ReferenceFinder.Weaver.ModuleDefinition.ImportMethod(
+                                ReferenceFinder.SystemTypeGetTypeFromHandleMethod)), processor);
+
+                default:
+                    throw new ArgumentException("Unrecognized attribute parameter type.", "argument");
+            }
+        }
+
+        		public static MethodReference MakeGeneric(this MethodReference method, params TypeReference[] arguments)
+		{
+			if (method.GenericParameters.Count != arguments.Length)
+			{
+				throw new ArgumentException("Invalid number of generic type arguments supplied");
+			}
+
+			if (arguments.Length == 0)
+			{
+				return method;
+			}
+
+			GenericInstanceMethod genericTypeReference = new GenericInstanceMethod(method);
+
+			foreach (TypeReference argument in arguments)
+			{
+				genericTypeReference.GenericArguments.Add(argument);
+			}
+
+			return genericTypeReference;
+		}
     }
 }
