@@ -27,7 +27,7 @@ namespace Cache.Fody
 
             //weaving
             WeaveHelper.Weave(this, methods.Methods);
-            WeaveHelper.Weave(this, methods.Properties);
+            //WeaveHelper.Weave(this, methods.Properties);
 
             //
             AttributeChecker.RemoveAttributes(this, _types);

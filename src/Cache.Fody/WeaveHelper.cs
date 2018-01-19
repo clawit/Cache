@@ -578,10 +578,14 @@ namespace Cache.Fody
                 }
 
                 // Call string.format
+
+
+
+                var ins = processor.Create(OpCodes.Call, methodDefinition.Module.ImportMethod(ReferenceFinder.StringFormatMethod));
+
                 return current
                     .AppendLdloc(processor, objectArrayIndex)
-                    .Append(processor.Create(OpCodes.Call, methodDefinition.Module.ImportMethod(ReferenceFinder.StringFormatMethod)),
-                        processor)
+                    .Append(ins, processor)
                     .AppendStloc(processor, cacheKeyIndex);
             }
         }

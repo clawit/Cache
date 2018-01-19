@@ -12,16 +12,16 @@ namespace Tests
         static UnitTest()
         {
             var weavingTask = new ModuleWeaver();
-            testResult = weavingTask.ExecuteTestRun("AssemblyToReference.dll");
+            testResult = weavingTask.ExecuteTestRun("AssemblyToReference.dll", false);
         }
 
         [Fact]
         public void ValidateHelloWorldIsInjected()
         {
-            var type = testResult.Assembly.GetType("AssemblyToReference.NormalClass");
+            var type = testResult.Assembly.GetType("AssemblyToReference.NormalClass", true);
             var instance = (dynamic)Activator.CreateInstance(type);
 
-            Assert.Equal("12", instance.AttributeA);
+            Assert.Equal(3.14M, instance.Calc2(1, 2));
         }
     }
 }

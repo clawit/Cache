@@ -30,7 +30,7 @@
             _weaver = weaver;
 
             DebugWriteLineMethod = weaver.FindType("System.Diagnostics.Debug").Method("WriteLine");
-            StringFormatMethod = weaver.FindType("System.String").Method("Format");
+            StringFormatMethod = weaver.FindType("System.String").Method("Format", new string[] { "String", "Object[]" });
             DictionaryConstructor = weaver.FindType("Dictionary`2").Resolve().GetConstructors().FirstOrDefault();
             DictionaryAddMethod = weaver.FindType("Dictionary`2").Method("Add");
             SystemTypeGetTypeFromHandleMethod = weaver.FindType("Type").Method("GetTypeFromHandle");

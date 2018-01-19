@@ -243,7 +243,7 @@
 
         public static MethodReference ImportMethod(this ModuleDefinition module, MethodDefinition methodDefinition)
         {
-            return module.ImportMethod(methodDefinition);
+            return module.ImportReference(methodDefinition);
         }
 
         public static Instruction Prepend(this Instruction instruction, Instruction instructionBefore, ILProcessor processor)
