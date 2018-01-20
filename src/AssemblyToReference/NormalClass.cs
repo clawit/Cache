@@ -66,10 +66,17 @@ namespace AssemblyToReference
         //    return 3.14M;
         //}
 
+        //[Cache]
+        //public decimal Calc2(int a, int b)
+        //{
+        //    Thread.Sleep(10000);
+        //    return 3.14M;
+        //}
+
         [Cache]
-        public decimal Calc2(int a, int b)
+        public decimal Calc3(int a, Dictionary<int, string> list)
         {
-            Thread.Sleep(10);
+            Thread.Sleep(10000);
             return 3.14M;
         }
     }

@@ -300,11 +300,10 @@ namespace Cache.Fody
             setter.Body.InitLocals = true;
             setter.Body.SimplifyMacros();
 
-            //TODO:Add generic parameters support
-            //if (propertyGet.DeclaringType.HasGenericParameters)
-            //{
-            //    propertyGet = propertyGet.MakeHostInstanceGeneric(propertyGet.DeclaringType.GenericParameters.Cast<TypeReference>().ToArray());
-            //}
+            if (propertyGet.DeclaringType.HasGenericParameters)
+            {
+                propertyGet = propertyGet.MakeHostInstanceGeneric(propertyGet.DeclaringType.GenericParameters.Cast<TypeReference>().ToArray());
+            }
 
             Instruction firstInstruction = setter.Body.Instructions.First();
             ILProcessor processor = setter.Body.GetILProcessor();
@@ -387,11 +386,10 @@ namespace Cache.Fody
 
             methodDefinition.Body.SimplifyMacros();
 
-            //TODO:Add generic parameters support
-            //if (propertyGet.DeclaringType.HasGenericParameters)
-            //{
-            //    propertyGet = propertyGet.MakeHostInstanceGeneric(propertyGet.DeclaringType.GenericParameters.Cast<TypeReference>().ToArray());
-            //}
+            if (propertyGet.DeclaringType.HasGenericParameters)
+            {
+                propertyGet = propertyGet.MakeHostInstanceGeneric(propertyGet.DeclaringType.GenericParameters.Cast<TypeReference>().ToArray());
+            }
 
             Instruction firstInstruction = methodDefinition.Body.Instructions.First();
 

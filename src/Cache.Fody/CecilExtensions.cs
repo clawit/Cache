@@ -2,6 +2,7 @@
 {
     using Mono.Cecil;
     using Mono.Cecil.Cil;
+    using Mono.Cecil.Rocks;
     using Mono.Collections.Generic;
     using System;
     using System.Collections.Generic;
@@ -179,28 +180,27 @@
             return methodDefinition;
         }
 
-        //TODO:Add generic parameters support
-        //public static MethodReference MakeHostInstanceGeneric(this MethodReference self, TypeReference[] args)
-        //{
-        //    MethodReference reference = new MethodReference(self.Name, self.ReturnType)
-        //    {
-        //        HasThis = self.HasThis,
-        //        ExplicitThis = self.ExplicitThis,
-        //        CallingConvention = self.CallingConvention,
-        //    };
+        public static MethodReference MakeHostInstanceGeneric(this MethodReference self, params TypeReference[] args)
+        {
+            MethodReference reference = new MethodReference(self.Name, self.ReturnType, self.DeclaringType.MakeGenericInstanceType(args))
+            {
+                HasThis = self.HasThis,
+                ExplicitThis = self.ExplicitThis,
+                CallingConvention = self.CallingConvention,
+            };
 
-        //    foreach (ParameterDefinition parameter in self.Parameters)
-        //    {
-        //        reference.Parameters.Add(new ParameterDefinition(parameter.ParameterType));
-        //    }
+            foreach (ParameterDefinition parameter in self.Parameters)
+            {
+                reference.Parameters.Add(new ParameterDefinition(parameter.ParameterType));
+            }
 
-        //    foreach (GenericParameter genericParam in self.GenericParameters)
-        //    {
-        //        reference.GenericParameters.Add(new GenericParameter(genericParam.Name, reference));
-        //    }
+            foreach (GenericParameter genericParam in self.GenericParameters)
+            {
+                reference.GenericParameters.Add(new GenericParameter(genericParam.Name, reference));
+            }
 
-        //    return reference;
-        //}
+            return reference;
+        }
 
         public static int AddVariable(this MethodDefinition method, TypeReference typeReference)
         {
