@@ -44,7 +44,7 @@
 
         public static bool IsInterceptor(this TypeReference type)
         {
-            return type.Name == "MethodTimeLogger";
+            return type.Name == "CacheLogger";
         }
         public static bool IsInstanceConstructor(this MethodDefinition methodDefinition)
         {

@@ -25,8 +25,10 @@ namespace Cache.Fody
             //
             var methods = WeaveHelper.GetWeaveMethods(this);
 
-            //weaving
+            //weaving method
             WeaveHelper.Weave(this, methods.Methods);
+            
+            //TODO:for now we dont support proerty
             //WeaveHelper.Weave(this, methods.Properties);
 
             //

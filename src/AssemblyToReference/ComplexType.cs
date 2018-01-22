@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace AssemblyToReference
 {
-    class ComplexType
+    public class ComplexType
     {
+
     }
 }

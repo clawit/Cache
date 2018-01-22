@@ -46,7 +46,7 @@
                 {
                     if (method.ContainsAttribute(WeaveHelper.CacheAttributeName))
                     {
-                        Weaver.LogError($"Method '{method.FullName}' is abstract but has a [TimeAttribute]. Remove this attribute.");
+                        Weaver.LogError($"Method '{method.FullName}' is abstract but has a [CacheAttribute]. Remove this attribute.");
                     }
                 }
             }

@@ -48,22 +48,23 @@ namespace Cache.Fody
                     method.RemoveCacheAttribute(NoCacheAttributeName);
                 }
 
-                foreach (PropertyDefinition property in type.Properties)
-                {
-                    if (ShouldWeaveProperty(property))
-                    {
-                        // Store Cache attribute, property attribute takes precedence over class attributes
-                        CustomAttribute attribute =
-                            property.CustomAttributes.SingleOrDefault(x => x.Constructor.DeclaringType.Name == CacheAttributeName) ??
-                                property.DeclaringType.CustomAttributes.SingleOrDefault(
-                                    x => x.Constructor.DeclaringType.Name == CacheAttributeName);
+                //TODO:for now we don't support property cache
+                //foreach (PropertyDefinition property in type.Properties)
+                //{
+                //    if (ShouldWeaveProperty(property))
+                //    {
+                //        // Store Cache attribute, property attribute takes precedence over class attributes
+                //        CustomAttribute attribute =
+                //            property.CustomAttributes.SingleOrDefault(x => x.Constructor.DeclaringType.Name == CacheAttributeName) ??
+                //                property.DeclaringType.CustomAttributes.SingleOrDefault(
+                //                    x => x.Constructor.DeclaringType.Name == CacheAttributeName);
 
-                        result.Add(property, attribute);
-                    }
+                //        result.Add(property, attribute);
+                //    }
 
-                    property.RemoveCacheAttribute(CacheAttributeName);
-                    property.RemoveCacheAttribute(NoCacheAttributeName);
-                }
+                //    property.RemoveCacheAttribute(CacheAttributeName);
+                //    property.RemoveCacheAttribute(NoCacheAttributeName);
+                //}
 
                 type.RemoveCacheAttribute(CacheAttributeName);
                 type.RemoveCacheAttribute(NoCacheAttributeName);
