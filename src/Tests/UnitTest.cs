@@ -17,14 +17,14 @@ namespace Tests
             testResult = weavingTask.ExecuteTestRun("AssemblyToReference.dll", false);
         }
 
-        //[Fact]
-        //public void InstanceClassTest()
-        //{
-        //    var type = testResult.Assembly.GetType("AssemblyToReference.NormalClass", true);
-        //    var instance = (dynamic)Activator.CreateInstance(type);
+        [Fact]
+        public void InstanceClassTest()
+        {
+            var type = testResult.Assembly.GetType("AssemblyToReference.NormalClass", true);
+            var instance = (dynamic)Activator.CreateInstance(type);
 
-        //    Assert.Equal(3.14M, instance.Calc2(1, 2));
-        //}
+            Assert.Equal(3.14M, instance.Calc2(1, 2));
+        }
 
         //[Fact]
         //public void InstanceClassTestWithGeneric()

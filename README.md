@@ -1,18 +1,61 @@
 # Cache
 
-## This is an add-in for [Fody](https://github.com/Fody/Fody/)
-
 <img src="https://github.com/KevinYeti/Cache/raw/master/icon.png" width="64">
 
 Injects method cache code.
 
+### This is an add-in for [Fody](https://github.com/Fody/Fody/)
 [Introduction to Fody](http://github.com/Fody/Fody/wiki/SampleUsage)
 
+This project was forked by [MethodTimer](https://github.com/Fody/MethodTimer) original.
+And updated to support DotNet Core.
+
 ## Milestone
+- [x] Support dotnet core
 - [x] Support instance of class cache
 - [x] Support static of method cache
 - [ ] Support property of class cache
 - [ ] Support complex parameters of method cache
+
+## Your Code
+
+	[Cache]
+	public int Add(int a, int b)
+	{
+		return a + b;
+	}
+
+	[Cache]
+	public string AlsoWorksForProperties
+	{
+		get
+		{
+			return DoSomeCalculations(this.parameterField);
+		}
+		set
+		{
+			this.parameterField = value;
+		}
+	}
+
+## What gets compiled
+
+	public int Add(int a, int b)
+	{
+		string cacheKey = string.Format("Namespace.Class.Add_{0}_{1}", new object[] { a, b });
+	
+		if(Cache.Contains(cacheKey))
+		{
+			return Cache.Retrieve<int>(cacheKey);
+		}
+		
+		int result = a + b;
+		
+		Cache.Store(cacheKey, result);
+		
+		return result;
+	}
+  
 
 ## Usage
 

@@ -3,8 +3,16 @@
   <PropertyGroup>
     <TargetFrameworks>net46;netstandard2.0</TargetFrameworks>
     <PackageVersion>1.0.1</PackageVersion>
-    <Description>Cache</Description>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Description>Injects method cache code.</Description>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://github.com/KevinYeti/Cache</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/KevinYeti/Cache/master/icon.png</PackageIconUrl>
+    <PackageTags>Cache, ILWeaving, Fody, Cecil, AOP</PackageTags>
+    <PackageLicenseUrl>https://github.com/KevinYeti/Cache/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageId>Cache.Fody</PackageId>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
