@@ -10,9 +10,9 @@ namespace AssemblyToReference
 {
     public class NormalClass
     {
-        public RuntimeCache Cache { get; set; }
+        public static RuntimeCache Cache { get; set; }
 
-        public NormalClass()
+        static NormalClass()
         {
             Cache = new RuntimeCache();
         }
@@ -73,10 +73,17 @@ namespace AssemblyToReference
         //    return 3.14M;
         //}
 
+        //[Cache]
+        //public decimal Calc3(int a, Dictionary<int, string> list)
+        //{
+        //    Thread.Sleep(10000);
+        //    return 3.14M;
+        //}
+
         [Cache]
-        public decimal Calc3(int a, Dictionary<int, string> list)
+        public static decimal Calc4(int a, int b)
         {
-            Thread.Sleep(10000);
+            Thread.Sleep(5000);
             return 3.14M;
         }
     }

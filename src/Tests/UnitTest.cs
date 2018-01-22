@@ -2,6 +2,7 @@
 using Fody;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Xunit;
 
 namespace Tests
@@ -25,21 +26,30 @@ namespace Tests
         //    Assert.Equal(3.14M, instance.Calc2(1, 2));
         //}
 
+        //[Fact]
+        //public void InstanceClassTestWithGeneric()
+        //{
+        //    var type = testResult.Assembly.GetType("AssemblyToReference.NormalClass", true);
+        //    var instance = (dynamic)Activator.CreateInstance(type);
+
+        //    var p2 = new Dictionary<int, string>();
+        //    p2.Add(1, "111");
+        //    p2.Add(2, "222");
+        //    Assert.Equal(3.14M, instance.Calc3(1,  p2));
+        //    p2.Add(3, "333");
+        //    p2.Add(4, "444");
+        //    Assert.Equal(3.14M, instance.Calc3(1, p2));
+
+        //}
+
         [Fact]
-        public void InstanceClassTestWithGeneric()
+        public void StaticMethodTest()
         {
             var type = testResult.Assembly.GetType("AssemblyToReference.NormalClass", true);
-            var instance = (dynamic)Activator.CreateInstance(type);
+            var mf = type.GetMethod("Calc4", BindingFlags.Public | BindingFlags.Static);
 
-            var p2 = new Dictionary<int, string>();
-            p2.Add(1, "111");
-            p2.Add(2, "222");
-            Assert.Equal(3.14M, instance.Calc3(1,  p2));
-            p2.Add(3, "333");
-            p2.Add(4, "444");
-            Assert.Equal(3.14M, instance.Calc3(1, p2));
+            Assert.Equal(3.14M, mf.Invoke(null, new object[] { 1, 2}));
 
         }
-
     }
 }
