@@ -17,8 +17,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AssemblyToReference\AssemblyToReference.csproj" />
-    <ProjectReference Include="..\Cache.Attribute\Cache.csproj" />
     <ProjectReference Include="..\Cache.Fody\Cache.Fody.csproj" />
+    <ProjectReference Include="..\Cache\Cache.csproj" />
   </ItemGroup>
 
 </Project>
