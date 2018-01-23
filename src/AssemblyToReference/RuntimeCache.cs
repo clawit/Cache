@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AssemblyToReference
 {
-    public class RuntimeCache : ICacheProvider
+    public class RuntimeCache 
     {
         public RuntimeCache()
         {
