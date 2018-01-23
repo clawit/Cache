@@ -49,7 +49,5 @@ namespace Cache.Fody
             yield return "netstandard";
         }
 
-        public override bool ShouldCleanReference => true;
-
     }
 }

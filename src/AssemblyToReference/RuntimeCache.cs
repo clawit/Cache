@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AssemblyToReference
 {
-    public class RuntimeCache 
+    public class RuntimeCache : ICacheProvider
     {
         public RuntimeCache()
         {
@@ -38,6 +38,11 @@ namespace AssemblyToReference
         public void Remove(string key)
         {
             Storage.Remove(key);
+        }
+
+        public void Clear()
+        {
+            Storage.Clear();
         }
     }
 }

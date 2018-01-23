@@ -14,5 +14,6 @@ namespace Cache
         // You can skip this method but then only readonly properties are supported
         void Remove(string key);
 
+        void Clear();
     }
 }

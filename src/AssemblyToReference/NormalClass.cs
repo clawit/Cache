@@ -10,7 +10,7 @@ namespace AssemblyToReference
 {
     public class NormalClass
     {
-        public static RuntimeCache Cache { get; set; }
+        public static ICacheProvider Cache { get; set; }
 
         static NormalClass()
         {
