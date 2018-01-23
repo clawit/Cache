@@ -14,7 +14,7 @@ namespace AssemblyToReference
 
         static NormalClass()
         {
-            Cache = new RuntimeCache();
+
         }
 
         //public string AttributeA {
@@ -69,6 +69,8 @@ namespace AssemblyToReference
         [Cache]
         public decimal Calc2(int a, int b)
         {
+            Cache = CacheProvider.Provider;
+
             Thread.Sleep(10000);
             return 3.14M;
         }

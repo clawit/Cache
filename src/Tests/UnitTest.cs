@@ -1,4 +1,6 @@
-﻿using Cache.Fody;
+﻿using AssemblyToReference;
+using Cache;
+using Cache.Fody;
 using Fody;
 using System;
 using System.Collections.Generic;
@@ -15,6 +17,7 @@ namespace Tests
         {
             var weavingTask = new ModuleWeaver();
             testResult = weavingTask.ExecuteTestRun("AssemblyToReference.dll", false);
+            new CacheProvider(new RuntimeCache());
         }
 
         [Fact]
