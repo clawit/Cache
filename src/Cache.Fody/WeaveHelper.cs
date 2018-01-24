@@ -387,9 +387,8 @@ namespace Cache.Fody
         {
             //Import Reference 
             TypeDefinition mdlClass = methodDefinition.DeclaringType;
-            var refModule = ModuleDefinition.ReadModule("Cache.dll");
+            var refModule = ReferenceFinder.CacheAssembly.MainModule;
             var refInterface = refModule.GetType("Cache.ICacheProvider");
-            //mdlClass.Module.ImportReference(refInterface);
 
             //define the field we store the value in 
             FieldDefinition field = new FieldDefinition(
@@ -440,31 +439,6 @@ namespace Cache.Fody
             PropertyDefinition propertyInject = null;
             if (propertyGet == null && methodDefinition.IsStatic && !methodDefinition.DeclaringType.Properties.Any( p => p.Name == "Cache"))
             {
-                //add field
-                //FieldDefinition fldCache = new FieldDefinition("Cache", FieldAttributes.Public | FieldAttributes.Static, 
-                //        new TypeReference("Cache", "ICacheProvider", methodDefinition.Module, methodDefinition.Module));
-
-                //add property
-                //PropertyDefinition property = new PropertyDefinition("Cache", PropertyAttributes.None,
-                //            moduleClass.Module.ImportReference(t));
-                //moduleClass.Module.ImportReference(new TypeReference("Cache", "ICacheProvider", refModule, refModule));
-                //moduleClass.Module.ImportReference(t);
-
-
-                //add getter
-
-                //property.GetMethod = new MethodDefinition("get_Cache", MethodAttributes.Static | MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName,
-                //    moduleClass.Module.ImportReference(t));
-                //property.GetMethod.DeclaringType = moduleClass;
-                //property.GetMethod.ReturnType = t;
-                //foreach (var item in p.GetMethod.Body.Instructions)
-                //{
-                //    property.GetMethod.Body.Instructions.Add(item);
-                //}
-
-
-
-                //moduleClass.Properties.Add(property);
                 propertyInject = InjectProperty(weaver, methodDefinition);
                 propertyGet = propertyInject.GetMethod;
             }
@@ -505,10 +479,10 @@ namespace Cache.Fody
 
             current = SetCacheKeyLocalVariable(weaver, current, methodDefinition, processor, cacheKeyIndex, objectArrayIndex);
 
-            //
+            //init CacheProvider when static method called
             if (methodDefinition.IsStatic)
             {
-                var refModule = ModuleDefinition.ReadModule("Cache.dll");
+                var refModule = ReferenceFinder.CacheAssembly.MainModule;
                 var refProvider = refModule.GetType("Cache.CacheProvider");
                 var refProviderGet = refProvider.Method("get_Provider");
                 var refSetter = propertyInject.SetMethod;
