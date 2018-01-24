@@ -208,7 +208,8 @@ namespace Cache.Fody
 
         public static bool IsMethodValidForWeaving(BaseModuleWeaver weaver, MethodDefinition propertyGet, MethodDefinition methodDefinition)
         {
-            if (propertyGet == null)
+            //only non-static method need a getter
+            if (propertyGet == null && !methodDefinition.IsStatic)
             {
                 weaver.LogWarning(string.Format("Class {0} does not contain or inherit Getter {1}. Skip weaving of method {2}.",
                     methodDefinition.DeclaringType.Name, CacheGetterName, methodDefinition.Name));
@@ -216,15 +217,16 @@ namespace Cache.Fody
                 return false;
             }
 
-            if (methodDefinition.IsStatic && !propertyGet.IsStatic)
-            {
-                weaver.LogWarning(string.Format("Method {2} of Class {0} is static, Getter {1} is not. Skip weaving of method {2}.",
-                    methodDefinition.DeclaringType.Name, CacheGetterName, methodDefinition.Name));
+            //not need anymore
+            //if (methodDefinition.IsStatic && !propertyGet.IsStatic)
+            //{
+            //    weaver.LogWarning(string.Format("Method {2} of Class {0} is static, Getter {1} is not. Skip weaving of method {2}.",
+            //        methodDefinition.DeclaringType.Name, CacheGetterName, methodDefinition.Name));
 
-                return false;
-            }
+            //    return false;
+            //}
 
-            if (!CheckCacheTypeMethods(weaver, propertyGet.ReturnType.Resolve()))
+            if (!methodDefinition.IsStatic && !CheckCacheTypeMethods(weaver, propertyGet.ReturnType.Resolve()))
             {
                 weaver.LogWarning(
                     string.Format(
@@ -381,8 +383,93 @@ namespace Cache.Fody
             return current;
         }
 
+        public static PropertyDefinition InjectProperty(BaseModuleWeaver weaver, MethodDefinition methodDefinition)
+        {
+            //Import Reference 
+            TypeDefinition mdlClass = methodDefinition.DeclaringType;
+            var refModule = ModuleDefinition.ReadModule("Cache.dll");
+            var refInterface = refModule.GetType("Cache.ICacheProvider");
+            //mdlClass.Module.ImportReference(refInterface);
+
+            //define the field we store the value in 
+            FieldDefinition field = new FieldDefinition(
+                "<Cache>k__BackingField", FieldAttributes.Private | FieldAttributes.Static, 
+                mdlClass.Module.ImportReference(refInterface));
+            mdlClass.Fields.Add(field);
+
+            //Create the get method 
+            MethodDefinition get = new MethodDefinition("get_Cache", 
+                MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Static,
+                mdlClass.Module.ImportReference(refInterface));
+            ILProcessor processorGet = get.Body.GetILProcessor();
+            get.Body.Instructions.Add(processorGet.Create(OpCodes.Ldsfld, field));
+            get.Body.Instructions.Add(processorGet.Create(OpCodes.Ret));
+
+            get.Body.InitLocals = true;
+            get.SemanticsAttributes = MethodSemanticsAttributes.Getter;
+            mdlClass.Methods.Add(get);
+
+            //Create the set method 
+            MethodDefinition set = new MethodDefinition("set_Cache",
+                MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Static,
+                mdlClass.Module.TypeSystem.Void);
+            ILProcessor processorSet = set.Body.GetILProcessor();
+            set.Body.Instructions.Add(processorSet.Create(OpCodes.Ldarg_0));
+            set.Body.Instructions.Add(processorSet.Create(OpCodes.Stsfld, field));
+            set.Body.Instructions.Add(processorSet.Create(OpCodes.Ret));
+            set.Parameters.Add(new ParameterDefinition("value", ParameterAttributes.None, 
+                mdlClass.Module.ImportReference(refInterface)));
+            set.SemanticsAttributes = MethodSemanticsAttributes.Setter;
+            mdlClass.Methods.Add(set);
+
+            //create the property 
+            PropertyDefinition propertyDefinition = new PropertyDefinition(
+                "Cache", PropertyAttributes.None, 
+                mdlClass.Module.ImportReference(refInterface))
+            { GetMethod = get, SetMethod = set };
+
+            //add the property to the type. 
+            mdlClass.Properties.Add(propertyDefinition);
+
+            return propertyDefinition;
+        }
+
         public static void WeaveMethod(BaseModuleWeaver weaver, MethodDefinition methodDefinition, CustomAttribute attribute, MethodReference propertyGet)
         {
+            //try to add propert 
+            PropertyDefinition propertyInject = null;
+            if (propertyGet == null && methodDefinition.IsStatic && !methodDefinition.DeclaringType.Properties.Any( p => p.Name == "Cache"))
+            {
+                //add field
+                //FieldDefinition fldCache = new FieldDefinition("Cache", FieldAttributes.Public | FieldAttributes.Static, 
+                //        new TypeReference("Cache", "ICacheProvider", methodDefinition.Module, methodDefinition.Module));
+
+                //add property
+                //PropertyDefinition property = new PropertyDefinition("Cache", PropertyAttributes.None,
+                //            moduleClass.Module.ImportReference(t));
+                //moduleClass.Module.ImportReference(new TypeReference("Cache", "ICacheProvider", refModule, refModule));
+                //moduleClass.Module.ImportReference(t);
+
+
+                //add getter
+
+                //property.GetMethod = new MethodDefinition("get_Cache", MethodAttributes.Static | MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName,
+                //    moduleClass.Module.ImportReference(t));
+                //property.GetMethod.DeclaringType = moduleClass;
+                //property.GetMethod.ReturnType = t;
+                //foreach (var item in p.GetMethod.Body.Instructions)
+                //{
+                //    property.GetMethod.Body.Instructions.Add(item);
+                //}
+
+
+
+                //moduleClass.Properties.Add(property);
+                propertyInject = InjectProperty(weaver, methodDefinition);
+                propertyGet = propertyInject.GetMethod;
+            }
+
+            //weave mthod 
             methodDefinition.Body.InitLocals = true;
 
             methodDefinition.Body.SimplifyMacros();
@@ -417,6 +504,18 @@ namespace Cache.Fody
             Instruction current = firstInstruction.Prepend(processor.Create(OpCodes.Ldstr, cacheKey), processor);
 
             current = SetCacheKeyLocalVariable(weaver, current, methodDefinition, processor, cacheKeyIndex, objectArrayIndex);
+
+            //
+            if (methodDefinition.IsStatic)
+            {
+                var refModule = ModuleDefinition.ReadModule("Cache.dll");
+                var refProvider = refModule.GetType("Cache.CacheProvider");
+                var refProviderGet = refProvider.Method("get_Provider");
+                var refSetter = propertyInject.SetMethod;
+                current = current.Append(processor.Create(OpCodes.Call, methodDefinition.Module.ImportReference(refProviderGet)), processor);
+                current = current.Append(processor.Create(OpCodes.Call, methodDefinition.Module.ImportReference(refSetter)), processor);
+            }
+
 
             current = InjectCacheKeyCreatedCode(weaver, methodDefinition, current, processor, cacheKeyIndex);
 

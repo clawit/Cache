@@ -155,7 +155,7 @@
 
         public static MethodDefinition GetPropertyGet(this TypeDefinition typeDefinition, string propertyName)
         {
-            return typeDefinition.Properties.Where(x => x.Name == propertyName).Select(x => x.GetMethod).SingleOrDefault();
+            return typeDefinition.Properties.Where(x => x.Name == propertyName).Select(x => x.GetMethod).FirstOrDefault();
         }
 
         public static MethodDefinition GetInheritedPropertyGet(this TypeDefinition baseType, string propertyName)

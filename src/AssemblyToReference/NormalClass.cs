@@ -10,11 +10,11 @@ namespace AssemblyToReference
 {
     public class NormalClass
     {
-        public static ICacheProvider Cache { get; set; }
+        //public static ICacheProvider Cache2 { get; set; }
 
         static NormalClass()
         {
-
+            //Cache2 = CacheProvider.Provider;
         }
 
         //public string AttributeA {
@@ -69,7 +69,7 @@ namespace AssemblyToReference
         [Cache]
         public decimal Calc2(int a, int b)
         {
-            Cache = CacheProvider.Provider;
+            
 
             Thread.Sleep(10000);
             return 3.14M;
