@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
-namespace Cache
+namespace Cache.Fody
 {
     [Serializable]
     public class NoCacheProviderException : Exception

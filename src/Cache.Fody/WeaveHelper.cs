@@ -387,8 +387,7 @@ namespace Cache.Fody
         {
             //Import Reference 
             TypeDefinition mdlClass = methodDefinition.DeclaringType;
-            var refModule = ReferenceFinder.CacheAssembly.MainModule;
-            var refInterface = refModule.GetType("Cache.ICacheProvider");
+            var refInterface = typeof(ICacheProvider);
 
             //define the field we store the value in 
             FieldDefinition field = new FieldDefinition(
@@ -482,11 +481,10 @@ namespace Cache.Fody
             //init CacheProvider when static method called
             if (methodDefinition.IsStatic)
             {
-                var refModule = ReferenceFinder.CacheAssembly.MainModule;
-                var refProvider = refModule.GetType("Cache.CacheProvider");
-                var refProviderGet = refProvider.Method("get_Provider");
+                var refProvider = methodDefinition.Module.ImportReference(typeof(CacheProvider));
+                var refProviderInstance = refProvider.Resolve().Properties.FirstOrDefault(p => p.Name == "Provider");// refProvideryMethod("get_Provider");
                 var refSetter = propertyInject.SetMethod;
-                current = current.Append(processor.Create(OpCodes.Call, methodDefinition.Module.ImportReference(refProviderGet)), processor);
+                current = current.Append(processor.Create(OpCodes.Call, methodDefinition.Module.ImportReference(refProviderInstance.GetMethod)), processor);
                 current = current.Append(processor.Create(OpCodes.Call, methodDefinition.Module.ImportReference(refSetter)), processor);
             }
 
