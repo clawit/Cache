@@ -25,6 +25,8 @@
 
         public static MethodDefinition SystemTypeGetTypeFromHandleMethod { get; set; }
 
+        public static AssemblyDefinition CacheAssembly { get; set; }
+
         public static void LoadReferences(BaseModuleWeaver weaver)
         {
             _weaver = weaver;
@@ -34,6 +36,7 @@
             DictionaryConstructor = weaver.FindType("Dictionary`2").Resolve().GetConstructors().FirstOrDefault();
             DictionaryAddMethod = weaver.FindType("Dictionary`2").Method("Add");
             SystemTypeGetTypeFromHandleMethod = weaver.FindType("Type").Method("GetTypeFromHandle");
+            CacheAssembly = new DefaultAssemblyResolver().Resolve(weaver.ModuleDefinition.AssemblyReferences.FirstOrDefault(r => r.Name == "Cache"));
         }
 
     }

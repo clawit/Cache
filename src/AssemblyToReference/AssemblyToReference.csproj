@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Cache.Fody\Cache.Fody.csproj" />
     <ProjectReference Include="..\Cache\Cache.csproj" />
   </ItemGroup>
 
