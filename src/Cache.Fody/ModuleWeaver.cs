@@ -4,6 +4,7 @@ using Mono.Cecil;
 using Mono.Cecil.Rocks;
 using Mono.Cecil.Cil;
 using Fody;
+using System;
 
 namespace Cache.Fody
 {
@@ -48,6 +49,5 @@ namespace Cache.Fody
             yield return "System.Core";
             yield return "netstandard";
         }
-
     }
 }

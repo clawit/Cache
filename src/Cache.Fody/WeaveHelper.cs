@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -443,6 +444,11 @@ namespace Cache.Fody
                 propertyGet = propertyInject.GetMethod;
             }
 
+            if (propertyInject == null )
+            {
+                propertyInject = methodDefinition.DeclaringType.Properties.FirstOrDefault(p => p.Name == "Cache");
+            }
+
             //weave mthod 
             methodDefinition.Body.InitLocals = true;
 
@@ -489,7 +495,6 @@ namespace Cache.Fody
                 current = current.Append(processor.Create(OpCodes.Call, methodDefinition.Module.ImportReference(refProviderGet)), processor);
                 current = current.Append(processor.Create(OpCodes.Call, methodDefinition.Module.ImportReference(refSetter)), processor);
             }
-
 
             current = InjectCacheKeyCreatedCode(weaver, methodDefinition, current, processor, cacheKeyIndex);
 

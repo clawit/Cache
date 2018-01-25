@@ -3,12 +3,15 @@
     using global::Fody;
     using Mono.Cecil;
     using Mono.Cecil.Rocks;
+    using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
+    using System.Reflection;
 
     public static class ReferenceFinder
     {
-        //private static IAssemblyResolver AssemblyResolver { get; set; }
+        private static AssemblyResolver AssemblyResolver { get; set; }
 
         //private static TypeDefinition CompilerGeneratedAttribute { get; set; }
 
@@ -36,7 +39,18 @@
             DictionaryConstructor = weaver.FindType("Dictionary`2").Resolve().GetConstructors().FirstOrDefault();
             DictionaryAddMethod = weaver.FindType("Dictionary`2").Method("Add");
             SystemTypeGetTypeFromHandleMethod = weaver.FindType("Type").Method("GetTypeFromHandle");
-            CacheAssembly = new DefaultAssemblyResolver().Resolve(weaver.ModuleDefinition.AssemblyReferences.FirstOrDefault(r => r.Name == "Cache"));
+
+            //load Cache reference
+            var references = SplitUpReferences(weaver);
+            AssemblyResolver = new AssemblyResolver(references);
+            CacheAssembly = AssemblyResolver.Resolve("Cache");
+        }
+
+        private static List<string> SplitUpReferences(BaseModuleWeaver weaver)
+        {
+            return weaver.References
+                .Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+                .ToList();
         }
 
     }

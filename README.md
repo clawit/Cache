@@ -7,7 +7,7 @@ Injects method cache code.
 ### This is an add-in for [Fody](https://github.com/Fody/Fody/)
 [Introduction to Fody](http://github.com/Fody/Fody/wiki/SampleUsage)
 
-This project was forked by [MethodTimer](https://github.com/Fody/MethodTimer) original.
+This project was forked by [MethodCache](https://github.com/Dresel/MethodCache) original.
 And updated to support DotNet Core.
 
 ## Milestone
