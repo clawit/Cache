@@ -44,5 +44,13 @@ namespace AssemblyToReference
         {
             Storage.Clear();
         }
+
+        public IEnumerable<string> Keys(Func<string, bool> predicate)
+        {
+            if (predicate == null)
+                return Storage.Keys;
+            else
+                return Storage.Keys.Where(predicate);
+        }
     }
 }

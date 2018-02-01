@@ -1,5 +1,8 @@
 ﻿#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
+using System;
+using System.Collections.Generic;
+
 namespace Cache
 {
     public interface ICacheProvider
@@ -15,5 +18,7 @@ namespace Cache
         void Remove(string key);
 
         void Clear();
+
+        IEnumerable<string> Keys(Func<string, bool> predicate);
     }
 }
