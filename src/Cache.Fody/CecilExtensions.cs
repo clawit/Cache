@@ -436,7 +436,7 @@
             }
         }
 
-        		public static MethodReference MakeGeneric(this MethodReference method, params TypeReference[] arguments)
+        public static MethodReference MakeGeneric(this MethodReference method, params TypeReference[] arguments)
 		{
 			if (method.GenericParameters.Count != arguments.Length)
 			{

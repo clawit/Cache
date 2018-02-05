@@ -28,8 +28,9 @@ namespace AssemblyToReference
             return (T)Storage[key];
         }
 
-        public void Store(string key, object data)
+        public void Store(string key, object data, IDictionary<string, object> parameters)
         {
+            Console.WriteLine(key + "Duration:" + (int)parameters["Duration"]);
             Storage[key] = data;
         }
 

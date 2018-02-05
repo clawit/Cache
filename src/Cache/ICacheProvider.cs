@@ -11,7 +11,7 @@ namespace Cache
 
         T Retrieve<T>(string key);
 
-        void Store(string key, object data);
+        void Store(string key, object data, IDictionary<string, object> parameters);
 
         // Remove is needed for writeable properties which must invalidate the Cache
         // You can skip this method but then only readonly properties are supported

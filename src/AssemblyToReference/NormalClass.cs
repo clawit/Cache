@@ -69,8 +69,10 @@ namespace AssemblyToReference
         [Cache]
         public decimal Calc2(int a, int b)
         {
-            
+            Dictionary<string, object> c = new Dictionary<string, object>();
+            c.Add("dur", 3600);
 
+            
             Thread.Sleep(10000);
             return 3.14M;
         }
@@ -82,7 +84,7 @@ namespace AssemblyToReference
         //    return 3.14M;
         //}
 
-        [Cache]
+        [Cache(Duration = 3600)]
         public static decimal Calc4(int a, int b)
         {
             Thread.Sleep(5000);

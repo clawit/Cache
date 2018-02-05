@@ -36,14 +36,24 @@
 
             DebugWriteLineMethod = weaver.FindType("System.Diagnostics.Debug").Method("WriteLine");
             StringFormatMethod = weaver.FindType("System.String").Method("Format", new string[] { "String", "Object[]" });
-            DictionaryConstructor = weaver.FindType("Dictionary`2").Resolve().GetConstructors().FirstOrDefault();
-            DictionaryAddMethod = weaver.FindType("Dictionary`2").Method("Add");
-            SystemTypeGetTypeFromHandleMethod = weaver.FindType("Type").Method("GetTypeFromHandle");
+             SystemTypeGetTypeFromHandleMethod = weaver.FindType("Type").Method("GetTypeFromHandle");
 
+            var typeDictionary = weaver.FindType("Dictionary`2");
+            var genericDic = typeDictionary.MakeGenericInstanceType(new TypeReference[] { weaver.ModuleDefinition.TypeSystem.String, weaver.ModuleDefinition.TypeSystem.Object });
+            DictionaryConstructor = genericDic.Resolve().GetConstructors().FirstOrDefault();
+            //.Resolve().GetConstructors().FirstOrDefault(); ;
+            //DictionaryConstructor = typeDictionary.MakeGeneric(new TypeReference[] { weaver.ModuleDefinition.TypeSystem.String, weaver.ModuleDefinition.TypeSystem.Object });
+            DictionaryAddMethod = genericDic.Resolve().Method("Add");
+
+#if DEBUG
+            CacheAssembly = weaver.ResolveAssembly("Cache");
+#else
             //load Cache reference
             var references = SplitUpReferences(weaver);
             AssemblyResolver = new AssemblyResolver(references);
             CacheAssembly = AssemblyResolver.Resolve("Cache");
+#endif
+
         }
 
         private static List<string> SplitUpReferences(BaseModuleWeaver weaver)
