@@ -30,7 +30,9 @@ namespace AssemblyToReference
 
         public void Store(string key, object data, IDictionary<string, object> parameters)
         {
-            Console.WriteLine(key + "Duration:" + (int)parameters["Duration"]);
+            if (parameters != null && parameters.Count > 0)
+                Console.WriteLine(key + "Duration:" + (int)parameters["Duration"]);
+
             Storage[key] = data;
         }
 

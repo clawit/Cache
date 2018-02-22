@@ -39,11 +39,14 @@
              SystemTypeGetTypeFromHandleMethod = weaver.FindType("Type").Method("GetTypeFromHandle");
 
             var typeDictionary = weaver.FindType("Dictionary`2");
-            var genericDic = typeDictionary.MakeGenericInstanceType(new TypeReference[] { weaver.ModuleDefinition.TypeSystem.String, weaver.ModuleDefinition.TypeSystem.Object });
+            var genericArg = new TypeReference[] { weaver.ModuleDefinition.TypeSystem.String, weaver.ModuleDefinition.TypeSystem.Object };
+            var genericDic = typeDictionary.MakeGenericInstanceType(genericArg);
             DictionaryConstructor = genericDic.Resolve().GetConstructors().FirstOrDefault();
-            //.Resolve().GetConstructors().FirstOrDefault(); ;
-            //DictionaryConstructor = typeDictionary.MakeGeneric(new TypeReference[] { weaver.ModuleDefinition.TypeSystem.String, weaver.ModuleDefinition.TypeSystem.Object });
             DictionaryAddMethod = genericDic.Resolve().Method("Add");
+
+            //make ctor method has generic parms, cause Resolve() will remove generic parameters all 
+            DictionaryConstructor.DeclaringType = DictionaryConstructor.DeclaringType.MakeGenericInstanceType(genericArg);
+            DictionaryAddMethod.DeclaringType = DictionaryAddMethod.DeclaringType.MakeGenericInstanceType(genericArg);
 
 #if DEBUG
             CacheAssembly = weaver.ResolveAssembly("Cache");
