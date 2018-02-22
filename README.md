@@ -16,6 +16,7 @@ And updated to support DotNet Core.
 - [x] Support static of method cache
 - [ ] Support property of class cache
 - [ ] Support complex parameters of method cache
+- [x] Support duration control
 
 ## Your Code
 
