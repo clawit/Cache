@@ -20,23 +20,10 @@ And updated to support DotNet Core.
 
 ## Your Code
 
-	[Cache]
+	[Cache(Duration = 3600)]
 	public int Add(int a, int b)
 	{
 		return a + b;
-	}
-
-	[Cache]
-	public string AlsoWorksForProperties
-	{
-		get
-		{
-			return DoSomeCalculations(this.parameterField);
-		}
-		set
-		{
-			this.parameterField = value;
-		}
 	}
 
 ## What gets compiled
@@ -52,7 +39,7 @@ And updated to support DotNet Core.
 		
 		int result = a + b;
 		
-		Cache.Store(cacheKey, result);
+		Cache.Store(cacheKey, result, new Dictionary<string, object>() { {"Duration", 3600}} );
 		
 		return result;
 	}
