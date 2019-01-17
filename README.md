@@ -1,6 +1,6 @@
 # Cache
 
-<img src="https://github.com/KevinYeti/Cache/raw/master/icon.png" width="64">
+<img src="https://github.com/clawit/Cache/raw/master/icon.png" width="64">
 
 Injects method cache code.
 
