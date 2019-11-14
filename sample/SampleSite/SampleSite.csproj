@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Fody" Version="2.3.20" />
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.9" />
   </ItemGroup>
 
   <ItemGroup>
