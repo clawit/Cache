@@ -1,11 +1,11 @@
-﻿using CacheLib.InMemory;
-using CacheLib.Runtime;
+﻿using Cache.Implement.InMemory;
+using Cache.Implement.Runtime;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using Cache;
 
-namespace CacheLib
+namespace Cache.Implement
 {
     public static class CacheServiceExtensions
     {

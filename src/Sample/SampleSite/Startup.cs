@@ -1,4 +1,4 @@
-﻿using CacheLib;
+﻿using Cache.Implement;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;

@@ -7,14 +7,14 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageId></PackageId>
     <Authors>Cache.Fody</Authors>
-    <PackageLicenseUrl>https://github.com/KevinYeti/Cache/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseUrl>https://github.com/clawit/Cache/blob/master/LICENSE</PackageLicenseUrl>
     <Copyright></Copyright>
-    <PackageProjectUrl>https://github.com/KevinYeti/Cache</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/KevinYeti/Cache/master/icon.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/clawit/Cache</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/clawit/Cache/master/icon.png</PackageIconUrl>
     <PackageTags>Cache, ILWeaving, Fody, Cecil, AOP</PackageTags>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
-    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.10.0</AssemblyVersion>
+    <FileVersion>1.1.10.0</FileVersion>
+    <Version>1.0.10</Version>
   </PropertyGroup>
 
   <ItemGroup>

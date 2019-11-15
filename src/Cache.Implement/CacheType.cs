@@ -1,4 +1,4 @@
-﻿namespace CacheLib
+﻿namespace Cache.Implement
 {
     public enum CacheType
     {

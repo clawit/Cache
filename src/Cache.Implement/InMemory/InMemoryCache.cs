@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace CacheLib.InMemory
+namespace Cache.Implement.InMemory
 {
     public class InMemoryCache : ICacheProvider
     {

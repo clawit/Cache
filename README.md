@@ -54,13 +54,12 @@ See also [Fody usage](https://github.com/Fody/Fody#usage).
 
 Install the [Cache.Fody NuGet package](https://nuget.org/packages/Cache.Fody/) and update the [Fody NuGet package](https://nuget.org/packages/Fody/):
 
-```
+```PM
 PM> Install-Package Cache.Fody
 PM> Update-Package Fody
 ```
 
 The `Update-Package Fody` is required since NuGet always defaults to the oldest, and most buggy, version of any dependency.
-
 
 ### Add to FodyWeavers.xml
 
@@ -77,12 +76,16 @@ Add `<Cache/>` to [FodyWeavers.xml](https://github.com/Fody/Fody#add-fodyweavers
 
 In addition to the actual weaving assembly the NuGet package will also add a file `CacheAttribute.cs` to the target project.
 
-```
+```csharp
 [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Module | AttributeTargets.Class | AttributeTargets.Method | AttributeTargets.Constructor,AllowMultiple = false)]
 class CacheAttribute : Attribute
 {
 }
 ```
+
+## Sample
+
+See also [Sample Site](src\Sample\Sample.md).
 
 ## Icon
 

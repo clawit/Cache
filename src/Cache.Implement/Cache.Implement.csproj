@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Cache.Implement</AssemblyName>
+    <RootNamespace>Cache.Implement</RootNamespace>
+    <Version>1.0.10.0</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AssemblyVersion>1.0.10.0</AssemblyVersion>
+    <FileVersion>1.0.10.0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Cache.Fody" Version="1.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+  </ItemGroup>
+</Project>

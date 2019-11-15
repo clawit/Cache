@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CacheLib.Runtime
+namespace Cache.Implement.Runtime
 {
     public class RuntimeCache : ICacheProvider
     {

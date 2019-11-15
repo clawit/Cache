@@ -4,10 +4,10 @@
     <TargetFrameworks>net46;netstandard2.0</TargetFrameworks>
     <Description>Injects method cache code.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageProjectUrl>https://github.com/KevinYeti/Cache</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/KevinYeti/Cache/master/icon.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/clawit/Cache</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/clawit/Cache/master/icon.png</PackageIconUrl>
     <PackageTags>Cache, ILWeaving, Fody, Cecil, AOP</PackageTags>
-    <PackageLicenseUrl>https://github.com/KevinYeti/Cache/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseUrl>https://github.com/clawit/Cache/blob/master/LICENSE</PackageLicenseUrl>
     <PackageId>Cache.Fody</PackageId>
     <AssemblyVersion>1.0.10.0</AssemblyVersion>
     <FileVersion>1.0.10.0</FileVersion>
