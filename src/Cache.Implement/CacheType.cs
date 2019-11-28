@@ -3,6 +3,7 @@
     public enum CacheType
     {
         RuntimeCache,
-        InMemoryCache
+        InMemoryCache,
+        DistributedMemoryCache
     }
 }
