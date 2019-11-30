@@ -195,16 +195,19 @@ namespace Cache.Implement.DistributedMemory
                             break;
                         case CacheAction.Store:
                             //用于同步缓存数据
-                            if (msg.Options.ContainsKey("DataType")
-                                && msg.Options.ContainsKey("Data")
+                            if (msg.Options.ContainsKey("Data")
                                 && msg.Options.ContainsKey("Parameters"))
                             {
                                 var parameters = msg.Options["Parameters"] as IDictionary<string, object>;
-
-                                var type = msg.Options["DataType"] as string;
                                 var dataStr = msg.Options["Data"] as string;
-                                var dataSerialized = Convert.FromBase64String(dataStr);
-                                var dataStore = BitSerializer.Deserialize(type, dataSerialized);
+
+                                object dataStore = null;
+                                if (!string.IsNullOrEmpty(dataStr))
+                                {
+                                    var type = msg.Options["DataType"] as string;
+                                    var dataSerialized = Convert.FromBase64String(dataStr);
+                                    dataStore = BitSerializer.Deserialize(type, dataSerialized);
+                                }
 
                                 CacheProvider.Provider.Store(msg.CacheKey, dataStore, parameters);
                             }

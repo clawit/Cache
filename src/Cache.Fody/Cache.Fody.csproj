@@ -7,7 +7,7 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageId></PackageId>
     <Authors>Cache.Fody</Authors>
-    <PackageLicenseUrl>https://github.com/clawit/Cache/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseUrl></PackageLicenseUrl>
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/clawit/Cache</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/clawit/Cache/master/icon.png</PackageIconUrl>
@@ -15,6 +15,7 @@
     <AssemblyVersion>1.0.10.0</AssemblyVersion>
     <FileVersion>1.1.10.0</FileVersion>
     <Version>1.0.10</Version>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

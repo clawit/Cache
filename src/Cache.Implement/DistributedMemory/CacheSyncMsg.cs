@@ -14,9 +14,6 @@ namespace Cache.Implement.DistributedMemory
             Options = new Dictionary<string, object>();
         }
 
-        #region 清理
-
-
         public DateTime CreatedAt { get; set; }
 
         public string CacheKey { get; set; }
@@ -39,8 +36,6 @@ namespace Cache.Implement.DistributedMemory
         public Dictionary<string, object> Options { get; set; }
 
         public Guid Sender { get; set; }
-
-        #endregion
 
         public static CacheSyncMsg CreateRemoveMsg(Guid sender, string key)
         {
@@ -97,10 +92,17 @@ namespace Cache.Implement.DistributedMemory
             };
             msg.Options.Add("Parameters", parameters);
 
-            var dataType = data.GetType().AssemblyQualifiedName;
-            msg.Options.Add("DataType", dataType);
-            var dataStr = Convert.ToBase64String(BitSerializer.Serialize(data));
-            msg.Options.Add("Data", dataStr);
+            if (data != null)
+            {
+                var dataType = data.GetType().AssemblyQualifiedName;
+                msg.Options.Add("DataType", dataType);
+                var dataStr = Convert.ToBase64String(BitSerializer.Serialize(data));
+                msg.Options.Add("Data", dataStr);
+            }
+            else
+            {
+                msg.Options.Add("Data", string.Empty);
+            }
 
             return msg;
         }
